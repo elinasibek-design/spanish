@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тренажёр ser и чисел</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Unbounded:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE everyday learning: bright, quick, no fuss
+   IDEA a Spanish azulejo tile board: each drill is a tile, each item you master becomes a painted tile
+   PICTURE the big drill card with its countdown bar, beside a mosaic of every item that turns cobalt azulejo once automatic
+   COLOUR saffron ground, rojo header band, cobalt for mastery, green and red for right and wrong
+   TYPE Unbounded for Spanish words and figures + Rubik for text
+   LAYOUT laptop: modes, card and answers left, mosaic and settings right; phone: title, card, answers, mosaic */
+:root{color-scheme:light;--bg:#ffd23f;--ink:#1d1408;--mut:#5a4718;--card:#fff;--soft:#fff6d1;--bd:#1d1408;--edge:#1d1408;--band:#c8102e;--red:#c8102e;--blue:#1b46b5;--ok:#13804a;--sun:#ffd23f}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark;--bg:#16110a;--ink:#f7ecd6;--mut:#bba987;--card:#241a10;--soft:#2f2416;--bd:#5a462b;--edge:#060402;--band:#5e0c17;--red:#ff6066;--blue:#7aa2ff;--ok:#3fd17f}}
+:root[data-theme=dark]{color-scheme:dark;--bg:#16110a;--ink:#f7ecd6;--mut:#bba987;--card:#241a10;--soft:#2f2416;--bd:#5a462b;--edge:#060402;--band:#5e0c17;--red:#ff6066;--blue:#7aa2ff;--ok:#3fd17f}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 Rubik,system-ui,sans-serif;overflow-x:clip}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto}
+.band{padding:clamp(20px,3vw,40px) max(4vw,16px)}
+header.band{background:var(--band);color:#fff;padding-bottom:0}
+.hd{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:4px 24px}
+h1{font:700 clamp(26px,4vw,44px)/1.05 Unbounded,Rubik,sans-serif;letter-spacing:-.02em;margin:0 0 8px;text-wrap:balance}
+.hd p{margin:0 0 18px;font-size:16px;opacity:.92}
+.tabs{display:flex;gap:6px}
+.tabs button{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:14px 14px 0 0;padding:12px 20px;font-weight:700;min-height:46px}
+.tabs [aria-selected=true]{background:var(--bg);color:var(--ink)}
+.trn{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(20px,3vw,36px);align-items:start}
+.modes{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{flex:none;border:2px solid var(--bd);background:transparent;border-radius:999px;padding:6px 14px;font-weight:500;font-size:15px;min-height:44px}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip:disabled{opacity:.45;cursor:default}
+.card{background:var(--card);border:3px solid var(--bd);border-radius:24px;box-shadow:0 8px 0 var(--edge);padding:16px clamp(16px,3vw,28px) 0;display:flex;flex-direction:column;min-height:clamp(260px,36vh,330px);overflow:hidden}
+.card.in{animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(8px);opacity:.5}}
+.card.ok{border-color:var(--ok);box-shadow:0 8px 0 var(--ok)}
+.card.bad{border-color:var(--red);box-shadow:0 8px 0 var(--red)}
+.top{display:flex;justify-content:space-between;gap:12px;font-size:15px;color:var(--mut)}
+.cnt{white-space:nowrap;font-variant-numeric:tabular-nums}
+.q{flex:1;display:grid;place-items:center;text-align:center;font-family:Unbounded,Rubik,sans-serif;font-weight:700;letter-spacing:-.02em;line-height:1.12;padding:12px 0 4px;text-wrap:balance;overflow-wrap:anywhere}
+.q.xl{font-size:clamp(52px,9vw,88px)}
+.q.l{font-size:clamp(34px,6vw,56px)}
+.q.m{font-size:clamp(22px,3.4vw,32px)}
+.h{text-align:center;color:var(--mut);min-height:1.5em}
+.sol{text-align:center;min-height:2.2em;font:600 clamp(17px,2.4vw,21px)/1.3 Unbounded,Rubik,sans-serif;color:var(--blue);padding:6px 0 12px}
+.tb{height:8px;margin:0 calc(-1 * clamp(16px,3vw,28px));background:var(--soft)}
+.tb i{display:block;height:100%;width:0;background:var(--sun)}
+.tb i.late{background:var(--red)}
+.blank{display:inline-block;min-width:3.2em;border-bottom:4px solid var(--red);margin:0 .12em;line-height:1}
+.blank.g{color:var(--ok);border-color:var(--ok)}
+.blank.r{color:var(--red)}
+.spk{width:clamp(96px,16vw,124px);aspect-ratio:1;border-radius:50%;border:3px solid var(--bd);background:var(--sun);color:#1d1408;box-shadow:0 5px 0 var(--edge);display:grid;place-items:center;padding:0}
+.spk svg{width:52%}
+.ans{margin-top:22px}
+.opts,.grades{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.opt{position:relative;min-height:60px;border:2px solid var(--bd);border-radius:16px;background:var(--card);font:600 clamp(16px,2.3vw,20px)/1.1 Unbounded,Rubik,sans-serif;box-shadow:0 4px 0 var(--edge);padding:8px 6px;transition:transform .06s}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--edge)}
+.opt.good{background:var(--ok);border-color:var(--ok);color:var(--card)}
+.opt.badb{background:var(--red);border-color:var(--red);color:var(--card)}
+.k{position:absolute;top:4px;left:8px;font:500 13px Rubik,sans-serif;font-style:normal;color:var(--mut);display:none}
+.opt.good .k,.opt.badb .k{color:inherit}
+@media(hover:hover) and (pointer:fine){.k{display:block}}
+.pad{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.pad .opt{font-size:22px;min-height:56px}
+.grades .opt{font:700 15px Rubik,sans-serif}
+.big{width:100%;min-height:58px;border:0;border-radius:16px;background:var(--ink);color:var(--bg);font:600 17px Unbounded,Rubik,sans-serif;box-shadow:0 4px 0 var(--edge)}
+.big.alt{background:var(--red);color:#fff}
+.endb{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.typ{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px}
+.typ input{font:600 20px Unbounded,Rubik,sans-serif;padding:10px 14px;border:2px solid var(--bd);border-radius:14px;background:var(--card);color:var(--ink);min-height:56px;width:100%}
+.typ input.g{border-color:var(--ok);color:var(--ok)}
+.typ input.r{border-color:var(--red);color:var(--red);text-decoration:line-through}
+.go{border:0;border-radius:14px;background:var(--ink);color:var(--bg);font-weight:700;padding:0 18px;min-height:56px}
+.acc{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px}
+.acc button{min-width:44px;min-height:44px;border:2px solid var(--bd);border-radius:12px;background:var(--soft);font:600 18px Rubik,sans-serif}
+.fb{min-height:60px;padding-top:16px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.okc{color:var(--ok)}
+.badc{color:var(--red)}
+.nx{margin-left:auto;border:2px solid var(--bd);background:var(--card);border-radius:12px;min-height:44px;padding:0 18px;font-weight:700;box-shadow:0 3px 0 var(--edge)}
+.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:22px 0 16px}
+.sum b{display:block;font:700 clamp(24px,5vw,44px)/1 Unbounded,Rubik,sans-serif;letter-spacing:-.02em;white-space:nowrap}
+.sum span{color:var(--mut);font-size:14px}
+.mist{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding-bottom:20px}
+.mist b{background:var(--soft);border-radius:8px;padding:3px 8px;font-weight:500}
+.clean{color:var(--ok);font-weight:700;margin:0 0 20px}
+.side{display:grid;gap:22px}
+.panel{background:var(--card);border:3px solid var(--bd);border-radius:22px;padding:18px clamp(16px,2.4vw,24px);box-shadow:0 6px 0 var(--edge)}
+.tot{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.tot b{font:700 clamp(38px,5vw,52px)/1 Unbounded,Rubik,sans-serif;letter-spacing:-.02em;color:var(--blue)}
+.tot span{color:var(--mut)}
+.bar{height:10px;border-radius:99px;background:var(--soft);margin:12px 0 16px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--blue);transition:width .4s}
+.mos{display:grid;gap:10px}
+.mr{display:grid;grid-template-columns:9.6em minmax(0,1fr);grid-template-areas:"n t" "c t";gap:0 10px;align-items:center}
+.mn{grid-area:n;text-align:left;border:0;background:none;padding:2px 0;min-height:30px;line-height:1.25;font-size:15px;font-weight:500;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--ink) 30%,transparent);text-underline-offset:3px}
+.mn:disabled{opacity:.5;text-decoration:none;cursor:default}
+.mc{grid-area:c;align-self:start;font-size:14px;color:var(--mut);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tiles{grid-area:t;display:flex;flex-wrap:wrap;gap:3px}
+.tile{display:inline-block;flex:none;width:16px;height:16px;border-radius:4px}
+.t0{background:color-mix(in srgb,var(--ink) 12%,transparent)}
+.ts{background:color-mix(in srgb,var(--ink) 26%,transparent)}
+.t1{background:color-mix(in srgb,var(--blue) 38%,var(--card))}
+.t2{background:color-mix(in srgb,var(--blue) 68%,var(--card))}
+.tw{background:var(--red)}
+.tm{background:radial-gradient(circle,#fff 0 2px,transparent 2.6px),radial-gradient(circle at 0 0,var(--sun) 0 5px,transparent 5.6px),radial-gradient(circle at 100% 0,var(--sun) 0 5px,transparent 5.6px),radial-gradient(circle at 0 100%,var(--sun) 0 5px,transparent 5.6px),radial-gradient(circle at 100% 100%,var(--sun) 0 5px,transparent 5.6px),#1b46b5}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:16px 0 0;font-size:14px;color:var(--mut)}
+.legend .tile{vertical-align:-3px;margin-right:6px}
+.rule{font-size:14px;color:var(--mut);margin:10px 0 0}
+.row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:8px 0;border-top:1px solid color-mix(in srgb,var(--ink) 14%,transparent)}
+.row:first-child{border-top:0;padding-top:0}
+.row b{font:700 22px Unbounded,Rubik,sans-serif}
+.seg{display:inline-flex;border:2px solid var(--bd);border-radius:12px;overflow:hidden}
+.seg button{border:0;background:none;min-height:40px;padding:0 14px;font-weight:500}
+.seg [aria-pressed=true]{background:var(--ink);color:var(--card)}
+.sw{width:56px;height:32px;border-radius:99px;border:2px solid var(--bd);background:var(--soft);position:relative;padding:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--ink);transition:left .15s}
+.sw[aria-checked=true]{background:var(--ok)}
+.sw[aria-checked=true]::after{left:27px;background:var(--card)}
+.lnk{border:0;background:none;padding:8px 2px;min-height:40px;text-decoration:underline;color:var(--mut);font-size:15px}
+.rst button+button{margin-left:8px}
+.ref{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+h2{font:700 clamp(20px,2.4vw,26px)/1.1 Unbounded,Rubik,sans-serif;letter-spacing:-.02em;margin:0 0 14px}
+.ph{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 12px}
+.cj{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ch{font-size:14px;color:var(--mut)}
+.cc,.nt{border:2px solid var(--bd);border-radius:16px;background:var(--soft);display:grid}
+.cc{gap:2px;text-align:left;padding:12px 14px;align-content:start}
+.pr{font:600 15px/1.25 Unbounded,Rubik,sans-serif}
+.ru,.tx{font-size:14px;color:var(--mut)}
+.fm{font:700 clamp(26px,3.6vw,36px)/1.1 Unbounded,Rubik,sans-serif;color:var(--red);letter-spacing:-.02em;margin-top:6px;justify-self:start}
+.nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:10px}
+.nt{justify-items:center;gap:2px;padding:10px 4px}
+.nt b{font:700 34px/1 Unbounded,Rubik,sans-serif;color:var(--blue)}
+.nt span{font-weight:700;font-size:17px}
+.nt small{font-size:13px;color:var(--mut)}
+.hid .cc:not(.open) .fm,.hid .cc:not(.open) .tx,.hidn .nt:not(.open) span,.hidn .nt:not(.open) small{color:transparent;border-radius:6px;background:repeating-linear-gradient(135deg,color-mix(in srgb,var(--ink) 24%,transparent) 0 2px,transparent 2px 7px)}
+.tip{font-size:14px;color:var(--mut);margin:12px 0 0}
+.notes,.meth{margin:0;padding-left:1.2em}
+.notes li,.meth li{margin:0 0 9px;max-width:66ch}
+.es{font-weight:700;color:var(--red)}
+@media(max-width:860px){.trn,.ref{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.modes{flex-wrap:nowrap;overflow-x:auto;margin:0 -16px 14px;padding:0 16px 4px;scrollbar-width:none}.hd p{display:none}}
+@media(max-width:480px){.opts.c2{grid-template-columns:repeat(2,minmax(0,1fr))}.mr{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"n c" "t t";gap:2px 10px}.pad{gap:6px}.pad .opt{font-size:19px}}
+@media(prefers-reduced-motion:reduce){.card.in{animation:none}.opt,.sw::after,.bar i{transition:none}}
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="wrap hd">
+    <div>
+      <h1>Ser, местоимения и счёт до 10</h1>
+      <p>Испанский тренажёр с озвучкой: отвечай быстро и говори вслух</p>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button id="tTrain" role="tab" aria-selected="true">Тренировка</button>
+      <button id="tRef" role="tab" aria-selected="false">Шпаргалка</button>
+    </nav>
+  </div>
+</header>
+<main>
+<section id="vTrain" class="band">
+  <div class="wrap trn">
+    <div>
+      <div class="modes" id="modes"></div>
+      <div class="card" id="card"></div>
+      <div class="ans" id="ans"></div>
+      <div class="fb" id="fb" aria-live="polite"></div>
+    </div>
+    <aside class="side">
+      <div class="panel">
+        <div class="tot"><b id="mCount">0</b><span>из <span id="mAll">0</span> карточек в автомате</span></div>
+        <div class="bar"><i id="mBar"></i></div>
+        <div class="mos" id="mosaic"></div>
+        <p class="legend"><span><i class="tile t0"></i>новая</span><span><i class="tile t2"></i>в процессе</span><span><i class="tile tw"></i>ошибка</span><span><i class="tile tm"></i>автомат</span></p>
+        <p class="rule">Плитка становится расписной после трёх быстрых верных ответов подряд: до 2,5 с на кнопках, до 4 с в предложениях и на слух, до 6 с при вводе. Ошибка обнуляет серию.</p>
+      </div>
+      <div class="panel">
+        <div class="row"><span>Ответ</span><div class="seg"><button id="inBtn">Кнопки</button><button id="inType">Ввод</button></div></div>
+        <div class="row"><span>Озвучка ответов</span><button id="snd" class="sw" role="switch" aria-checked="true" aria-label="Озвучка ответов"></button></div>
+        <div class="row"><span>Рекорд блица</span><b id="best">0</b></div>
+        <div class="row rst" id="rst"><button class="lnk" id="rstBtn">Сбросить прогресс</button></div>
+      </div>
+    </aside>
+  </div>
+</section>
+<section id="vRef" class="band" hidden>
+  <div class="wrap ref">
+    <div class="panel">
+      <div class="ph"><h2>Ser — быть</h2><button class="lnk" id="hideF">Закрыть формы</button></div>
+      <div class="cj" id="cj"></div>
+      <p class="tip">Нажми на клетку, чтобы услышать. Закрой формы, скажи вслух и открой, чтобы проверить себя.</p>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>Числа 0–10</h2><button class="lnk" id="hideN">Закрыть слова</button></div>
+      <div class="nums" id="nums"></div>
+      <p class="tip">Ударение в числах падает на предпоследний слог: CUA-tro, SIE-te, NUE-ve.</p>
+    </div>
+    <div class="panel">
+      <h2>Что важно запомнить</h2>
+      <ul class="notes">
+        <li><b>Ser</b> — «быть» про постоянное: кто ты, откуда, кем работаешь, какой ты. <span class="es" lang="es">Soy Ana. Soy de Rusia. Soy profesora.</span></li>
+        <li>Местоимение обычно опускают: форма глагола уже показывает, кто это. <span class="es" lang="es">Somos amigos</span> — мы друзья.</li>
+        <li><b>Usted</b> и <b>ustedes</b> переводятся как «Вы», но глагол у них как у él и ellos: <span class="es" lang="es">usted es, ustedes son</span>.</li>
+        <li><b>Vosotros, vosotras</b> говорят только в Испании. В Латинской Америке любое «вы» — <span class="es" lang="es">ustedes</span>.</li>
+        <li><b>Nosotras, vosotras, ellas</b> — только если в группе одни женщины. Есть хоть один мужчина — берём мужскую форму.</li>
+        <li><b>Tú</b> и <b>él</b> пишутся с ударением. Без него <span class="es" lang="es">tu</span> — это «твой», а <span class="es" lang="es">el</span> — артикль.</li>
+        <li><b>Uno</b> перед существительным превращается в <span class="es" lang="es">un amigo</span> или <span class="es" lang="es">una amiga</span>.</li>
+        <li>В Испании <b>c</b> перед e, i и буква <b>z</b> звучат как английское th: cero, cinco, diez. В Латинской Америке — как «с».</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h2>Как довести до автоматизма</h2>
+      <ol class="meth">
+        <li>Каждый день два раунда «Микс» по 20 карточек, это 3–4 минуты.</li>
+        <li>Каждый ответ произноси вслух, даже когда просто нажимаешь кнопку.</li>
+        <li>Тренажёр чаще даёт то, в чём ты ошибаешься или медлишь, а ошибку возвращает через пару карточек.</li>
+        <li>Когда больше половины плиток стали расписными, переключи ответ на «Ввод» и добавь «Скажи вслух».</li>
+        <li>В конце — блиц на 60 секунд. Побей свой рекорд.</li>
+        <li>Прогресс сохраняется в этом браузере на этом устройстве.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+{
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[¿?¡!.,]/g,'').replace(/\s+/g,' ').trim();
+const sec=ms=>(ms/1000).toFixed(1).replace('.',',')+' с';
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const mixOpts=(c,pool)=>shuf(shuf(pool.filter(x=>x!==c)).slice(0,5).concat(c));
+
+const P=[
+ {es:'yo',ru:'я',n:'',ser:'soy'},
+ {es:'tú',ru:'ты',n:'',ser:'eres'},
+ {es:'él',ru:'он',n:'',ser:'es'},
+ {es:'ella',ru:'она',n:'',ser:'es'},
+ {es:'usted',ru:'Вы',n:'вежливо, одному человеку',ser:'es'},
+ {es:'nosotros',ru:'мы',n:'мужчины или смешанная группа',ser:'somos'},
+ {es:'nosotras',ru:'мы',n:'только женщины',ser:'somos'},
+ {es:'vosotros',ru:'вы',n:'Испания; мужчины или смешанная группа',ser:'sois'},
+ {es:'vosotras',ru:'вы',n:'Испания; только женщины',ser:'sois'},
+ {es:'ellos',ru:'они',n:'мужчины или смешанная группа',ser:'son'},
+ {es:'ellas',ru:'они',n:'только женщины',ser:'son'},
+ {es:'ustedes',ru:'вы',n:'вежливо многим; в Лат. Америке — любое «вы»',ser:'son'}
+];
+const F=['soy','eres','es','somos','sois','son'];
+const FT={soy:'сой',eres:'эрэс',es:'эс',somos:'сомос',sois:'сойс',son:'сон'};
+const N=['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez'];
+const NT=['сэро','уно','дос','трэс','куатро','синко','сэйс','сьетэ','очо','нуэвэ','дьес'];
+const S=[
+ ['Yo ___ profesora.','Я учительница.','soy'],
+ ['Yo ___ de Rusia.','Я из России.','soy'],
+ ['Tú ___ mi amigo.','Ты мой друг.','eres'],
+ ['¿De dónde ___ tú?','Откуда ты?','eres'],
+ ['Él ___ de México.','Он из Мексики.','es'],
+ ['Ella ___ muy simpática.','Она очень милая.','es'],
+ ['Usted ___ el señor García.','Вы — сеньор Гарсия.','es','вежливо, одному человеку'],
+ ['Nosotros ___ estudiantes.','Мы студенты.','somos'],
+ ['Nosotras ___ hermanas.','Мы сёстры.','somos'],
+ ['Nosotros ___ cinco.','Нас пятеро.','somos'],
+ ['Vosotros ___ de España.','Вы из Испании.','sois','компании друзей, Испания'],
+ ['Vosotras ___ muy altas.','Вы очень высокие.','sois','подругам, Испания'],
+ ['Ellos ___ amigos.','Они друзья.','son'],
+ ['Ellas ___ profesoras.','Они учительницы.','son'],
+ ['Ustedes ___ muy amables.','Вы очень любезны.','son','вежливо, группе людей']
+];
+const full=s=>s[0].replace('___',s[2]);
+
+const M={mix:{name:'Микс'},blitz:{name:'Блиц 60 с'},
+ p2s:{name:'Местоимение → ser',ask:'Какая форма ser?'},
+ ru2p:{name:'Русский → местоимение',ask:'Как это по-испански?'},
+ s2p:{name:'Форма → кто',ask:'Кто так говорит?'},
+ sent:{name:'Предложения',ask:'Вставь нужную форму ser'},
+ n2w:{name:'Цифра → слово',ask:'Как это по-испански?'},
+ w2n:{name:'Слово → цифра',ask:'Какое это число?'},
+ ear:{name:'Числа на слух',ask:'Послушай и нажми число'},
+ say:{name:'Скажи вслух',ask:'Скажи по-испански вслух, потом проверь'},
+ miss:{name:'Ошибки'}};
+const ROWS=['p2s','ru2p','s2p','sent','n2w','w2n','ear','say'];
+const CHIPS=['mix','blitz'].concat(ROWS);
+const ITEMS=[];
+ROWS.forEach(m=>M[m].items=[]);
+const add=(m,o)=>{o.mode=m;o.id=m+M[m].items.length;M[m].items.push(o);ITEMS.push(o)};
+const ES=P.map(p=>p.es);
+P.forEach(p=>add('p2s',{q:p.es,h:p.ru+(p.n?' ('+p.n+')':''),a:[p.ser],say:p.es+' '+p.ser,k:'ch',opts:()=>F,show:p.es+' '+p.ser}));
+P.forEach(p=>add('ru2p',{q:p.ru,h:p.n,a:[p.es],say:p.es,k:'ch',opts:()=>mixOpts(p.es,ES),show:p.ru+' → '+p.es}));
+F.forEach(f=>{const g=P.filter(p=>p.ser===f).map(p=>p.es);add('s2p',{q:f,h:'',a:g,say:f,k:'ch',opts:()=>{const c=g[Math.random()*g.length|0];return mixOpts(c,ES.filter(x=>!g.includes(x)))},show:f+' — '+g.join(', ')})});
+S.forEach(s=>add('sent',{q:s[0],h:s[1],a:[s[2]],say:full(s),k:'ch',opts:()=>F,show:full(s)}));
+N.forEach((w,i)=>add('n2w',{q:String(i),h:'',a:[w],say:w,k:'ch',opts:()=>mixOpts(w,N),show:i+' — '+w}));
+N.forEach((w,i)=>add('w2n',{q:w,h:'',a:[String(i)],say:w,k:'pad',show:w+' — '+i}));
+N.forEach((w,i)=>add('ear',{q:'',h:'',a:[String(i)],say:w,k:'pad',ear:1,show:i+' — '+w}));
+S.forEach(s=>add('say',{q:s[1],h:s[3]?'подсказка: '+s[3]:'',a:[full(s)],say:full(s),k:'self',show:full(s)}));
+
+const syn=window.speechSynthesis||null;
+let voice=null;
+const pv=()=>{try{const v=syn.getVoices();voice=v.find(x=>/^es[-_]ES/i.test(x.lang))||v.find(x=>/^es/i.test(x.lang))||null}catch(e){}};
+if(syn){pv();try{syn.addEventListener('voiceschanged',pv)}catch(e){}}
+const speak=t=>{if(!syn)return;try{syn.cancel();const u=new SpeechSynthesisUtterance(t);u.lang=voice?voice.lang:'es-ES';if(voice)u.voice=voice;u.rate=.9;syn.speak(u)}catch(e){}};
+
+const KEY='ser-trainer-v1';
+let st={v:1,it:{},best:0,input:'btn',sound:true};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const rec=id=>st.it[id]||(st.it[id]={s:0,e:0,n:0,c:0,w:0});
+const mast=id=>((st.it[id]&&st.it[id].s)||0)>=3;
+const ek=it=>it.k==='ch'&&st.input==='type'?'type':it.k;
+const lim=it=>{const k=ek(it);if(k==='type')return it.mode==='sent'?8000:6000;if(it.mode==='sent'||it.ear)return 4000;if(k==='self')return 5000;return 2500};
+
+const card=$('#card'),ans=$('#ans'),fb=$('#fb');
+let R=null,cur=null,t0=0,phase='q',tm=0,tLate=0,tick=0,touched=false;
+const markTouch=()=>{touched=true};
+document.addEventListener('pointerdown',markTouch,{once:true});
+document.addEventListener('keydown',markTouch,{once:true});
+
+const pool=()=>R.ids?ITEMS.filter(i=>R.ids.includes(i.id)):(R.mode==='mix'||R.mode==='blitz')?ITEMS.filter(i=>i.mode!=='say'&&(i.mode!=='ear'||(syn&&R.mode==='mix'))):M[R.mode].items;
+const wt=it=>{const x=st.it[it.id];if(!x||!x.n)return 2.5;if(x.s>=3)return .5;return 1+(3-x.s)+Math.min(x.e,4)*1.2};
+const cntText=()=>R.mode==='blitz'?Math.max(0,Math.ceil((R.end-Date.now())/1000))+' с, счёт '+R.ok:R.n>=R.total?'повтор ошибки':(R.n+1)+' / '+R.total;
+
+function start(mode,ids){
+ clearTimeout(tm);clearTimeout(tLate);clearInterval(tick);
+ R={mode,ids:ids||null,total:mode==='blitz'?1e9:ids?Math.min(20,Math.max(8,ids.length*2)):20,n:0,ok:0,times:[],miss:new Map(),q:[],recent:[],gained:0,end:mode==='blitz'?Date.now()+60000:0};
+ renderModes();
+ if(mode==='blitz')tick=setInterval(()=>{const c=$('#cnt');if(c&&phase!=='end')c.textContent=cntText();if(Date.now()>=R.end)end()},200);
+ next();
+}
+function next(){
+ clearTimeout(tm);
+ if(!R)return;
+ let it=null;
+ if(R.n>=R.total){if(!R.q.length)return end();it=R.q.shift().it}
+ else{const i=R.q.findIndex(x=>x.due<=R.n);if(i>=0)it=R.q.splice(i,1)[0].it}
+ const pl=pool();
+ if(!it){let p=pl.filter(x=>!R.recent.includes(x.id));if(!p.length)p=pl;let sum=0;p.forEach(x=>sum+=wt(x));let r=Math.random()*sum;it=p[p.length-1];for(const x of p){r-=wt(x);if(r<=0){it=x;break}}}
+ R.recent.push(it.id);while(R.recent.length>Math.min(3,pl.length-1))R.recent.shift();
+ show(it);
+}
+function show(it){
+ cur=it;phase='q';clearTimeout(tLate);
+ const k=ek(it),opts=k==='ch'?it.opts():null;
+ let q;
+ if(it.ear)q='<button class="spk" id="spk" aria-label="Послушать ещё раз"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M7 18h8l11-9v30l-11-9H7z" fill="currentColor"/><path d="M32 17a10 10 0 0 1 0 14M37 12a17 17 0 0 1 0 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></button>';
+ else if(it.mode==='sent')q=esc(it.q).replace('___','<span class="blank" id="blank">&nbsp;</span>');
+ else q=esc(it.q);
+ const size=it.mode==='sent'||it.mode==='say'?'m':it.q.length>8?'l':'xl';
+ const lang=it.mode==='say'||it.mode==='ru2p'||it.mode==='n2w'?'ru':'es';
+ card.className='card';void card.offsetWidth;card.classList.add('in');
+ card.innerHTML=`<div class="top"><span class="lab">${esc(M[it.mode].ask)}</span><span class="cnt" id="cnt">${cntText()}</span></div><div class="q ${size}" lang="${lang}"><span>${q}</span></div><div class="h">${esc(it.ear?'Нажми на динамик, чтобы послушать ещё раз':it.h||'')}</div><div class="sol" id="sol"></div><div class="tb"><i id="tbar"></i></div>`;
+ if(k==='ch'){const c3=opts.every(o=>o.length<=6);ans.innerHTML=`<div class="opts ${c3?'c3':'c2'}">${opts.map((o,i)=>`<button class="opt" data-v="${esc(o)}" lang="es"><i class="k">${i+1}</i>${esc(o)}</button>`).join('')}</div>`}
+ else if(k==='type')ans.innerHTML=`<form class="typ" id="typ"><input id="inp" lang="es" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="go" placeholder="Напиши ответ" aria-label="Ответ"><button class="go">Проверить</button><div class="acc">${['á','é','í','ó','ú','ñ'].map(c=>`<button type="button" data-c="${c}">${c}</button>`).join('')}</div></form>`;
+ else if(k==='pad')ans.innerHTML=`<div class="pad">${N.map((w,i)=>`<button class="opt" data-v="${i}">${i}</button>`).join('')}</div>`;
+ else ans.innerHTML='<button class="big" id="reveal">Показать ответ</button>';
+ fb.innerHTML='';
+ const b=$('#tbar'),L=lim(it);
+ b.style.transition='none';b.style.width='0';void b.offsetWidth;b.style.transition=`width ${L}ms linear`;b.style.width='100%';
+ tLate=setTimeout(()=>b.classList.add('late'),L);
+ t0=performance.now();
+ if(it.ear)speak(it.say);
+ if(k==='type'&&touched){try{$('#inp').focus({preventScroll:true})}catch(e){}}
+}
+function freeze(){clearTimeout(tLate);const b=$('#tbar');if(b){const w=getComputedStyle(b).width;b.style.transition='none';b.style.width=w}}
+function grade(ok,fast,dt){
+ const x=rec(cur.id),was=x.s>=3;
+ x.n++;
+ if(ok){x.c++;x.w=0;if(fast)x.s=Math.min(x.s+1,9)}
+ else{x.s=0;x.e++;x.w=1;R.miss.set(cur.id,cur);if(!R.q.some(y=>y.it===cur)&&R.n<R.total+10)R.q.push({it:cur,due:R.n+3})}
+ R.n++;if(ok)R.ok++;R.times.push(dt);
+ const now=x.s>=3;if(now&&!was)R.gained++;if(was&&!now)R.gained--;
+ save();mosaic();
+ return now&&!was;
+}
+function answer(v,btn){
+ if(phase!=='q')return;
+ v=String(v);if(!v.trim())return;
+ const dt=performance.now()-t0,k=ek(cur),ok=cur.a.some(a=>norm(a)===norm(v));
+ const acc=ok&&k==='type'&&!cur.a.some(a=>a===v.trim().toLowerCase());
+ const fast=dt<=lim(cur),up=grade(ok,fast,dt);
+ freeze();phase='fb';
+ const bl=$('#blank');if(bl){bl.textContent=cur.a[0];bl.classList.add(ok?'g':'r')}
+ if(btn)btn.classList.add(ok?'good':'badb');
+ if(!ok)ans.querySelectorAll('[data-v]').forEach(b=>{if(cur.a.some(a=>norm(a)===norm(b.dataset.v)))b.classList.add('good')});
+ if(k==='type'){const i=$('#inp');i.readOnly=true;i.classList.add(ok?'g':'r')}
+ card.classList.add(ok?'ok':'bad');
+ $('#sol').innerHTML=`<span lang="es">${esc(cur.show)}</span>`;
+ if(ok)fb.innerHTML=`<b class="okc">Верно</b><span>${sec(dt)}, ${fast?'быстро':'медленно: серия не растёт'}</span>${acc?`<span>Пиши с ударением: <b lang="es">${esc(cur.a[0])}</b></span>`:''}${up?'<b>Плитка в автомате</b>':''}`;
+ else fb.innerHTML=`<b class="badc">Нет</b><span>правильно: <b lang="es">${esc(cur.a.join(' / '))}</b></span><button class="nx" id="nextB">Дальше</button>`;
+ if(!ok||(st.sound&&!cur.ear))speak(cur.say);
+ const bz=R.mode==='blitz';
+ if(ok)tm=setTimeout(next,bz?450:(cur.mode==='s2p'||acc||up)?1600:950);
+ else if(bz)tm=setTimeout(next,1400);
+}
+function reveal(){
+ if(phase!=='q'||cur.k!=='self')return;
+ cur.dt=performance.now()-t0;freeze();phase='rev';
+ $('#sol').innerHTML=`<span lang="es">${esc(cur.show)}</span>`;
+ if(st.sound)speak(cur.say);
+ ans.innerHTML='<div class="grades"><button class="opt" data-g="2">Сразу</button><button class="opt" data-g="1">С заминкой</button><button class="opt" data-g="0">Не вышло</button></div>';
+}
+function selfGrade(g){
+ if(phase!=='rev')return;
+ g=+g;grade(g>0,g===2,cur.dt);
+ card.classList.add(g?'ok':'bad');phase='fb';
+ tm=setTimeout(next,g?350:900);
+}
+function end(){
+ clearTimeout(tm);clearTimeout(tLate);clearInterval(tick);
+ if(phase==='end')return;
+ phase='end';
+ const avg=R.times.length?R.times.reduce((a,b)=>a+b,0)/R.times.length:0;
+ const miss=[...R.miss.values()];
+ let head;
+ if(R.mode==='blitz'){const nb=R.ok>st.best;if(nb){st.best=R.ok;save();sets()}
+  head=`<div class="sum"><div><b>${R.ok}</b><span>верных за 60 секунд</span></div><div><b>${st.best}</b><span>${nb&&R.ok?'новый рекорд':'рекорд'}</span></div><div><b>${R.times.length?sec(avg):'—'}</b><span>в среднем на ответ</span></div></div>`}
+ else head=`<div class="sum"><div><b>${R.ok}/${R.n}</b><span>верно</span></div><div><b>${sec(avg)}</b><span>в среднем на ответ</span></div><div><b>${R.gained>0?'+':''}${R.gained}</b><span>плиток в автомате</span></div></div>`;
+ card.className='card';
+ card.innerHTML=`<div class="top"><span class="lab">${R.mode==='blitz'?'Блиц окончен':'Раунд готов'}</span><span class="cnt">${esc(M[R.mode].name)}</span></div>${head}${miss.length?`<div class="mist"><span>Ошибки:</span>${miss.map(m=>`<b lang="es">${esc(m.show)}</b>`).join('')}</div>`:R.n?'<p class="clean">Без ошибок.</p>':''}`;
+ ans.innerHTML=`<div class="endb"><button class="big" id="again">Ещё раунд</button>${miss.length?'<button class="big alt" id="onlyMiss">Только ошибки</button>':''}</div>`;
+ fb.innerHTML='';
+ R.missIds=miss.map(m=>m.id);
+}
+
+function renderModes(){$('#modes').innerHTML=CHIPS.map(m=>`<button class="chip" data-m="${m}" aria-pressed="${!!R&&R.mode===m}"${m==='ear'&&!syn?' disabled':''}>${esc(M[m].name)}</button>`).join('')}
+function mosaic(){
+ let tot=0;
+ $('#mosaic').innerHTML=ROWS.map(m=>{const its=M[m].items,k=its.filter(i=>mast(i.id)).length;tot+=k;
+  return `<div class="mr"><button class="mn" data-m="${m}"${m==='ear'&&!syn?' disabled':''}>${esc(M[m].name)}</button><div class="tiles">${its.map(i=>{const x=st.it[i.id];const c=!x||!x.n?'t0':x.s>=3?'tm':x.w?'tw':x.s===2?'t2':x.s===1?'t1':'ts';return `<i class="tile ${c}" title="${esc(i.show)}: серия ${Math.min(x?x.s:0,3)} из 3"></i>`}).join('')}</div><span class="mc">${k}/${its.length}</span></div>`}).join('');
+ $('#mCount').textContent=tot;$('#mAll').textContent=ITEMS.length;$('#mBar').style.width=(tot/ITEMS.length*100)+'%';
+}
+function sets(){
+ $('#inBtn').setAttribute('aria-pressed',st.input==='btn');$('#inType').setAttribute('aria-pressed',st.input==='type');
+ $('#snd').setAttribute('aria-checked',!!st.sound);$('#best').textContent=st.best;
+}
+function setInput(v){st.input=v;save();sets();if(phase==='q'&&cur&&cur.k==='ch')show(cur)}
+
+$('#modes').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b)start(b.dataset.m)});
+$('#mosaic').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(b){start(b.dataset.m);$('#card').scrollIntoView({behavior:'smooth',block:'center'})}});
+card.addEventListener('click',e=>{if(e.target.closest('#spk')&&cur)speak(cur.say)});
+ans.addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.dataset.c){e.preventDefault();const i=$('#inp');if(!i||i.readOnly)return;const s=i.selectionStart??i.value.length,en=i.selectionEnd??s;i.value=i.value.slice(0,s)+t.dataset.c+i.value.slice(en);i.focus();i.setSelectionRange(s+1,s+1);return}
+ if(t.id==='reveal')return reveal();
+ if(t.dataset.g)return selfGrade(t.dataset.g);
+ if(t.id==='again')return start(R.mode,R.ids);
+ if(t.id==='onlyMiss')return start('miss',R.missIds);
+ if(t.dataset.v!==undefined){if(phase==='q')answer(t.dataset.v,t);else if(phase==='fb'&&t.classList.contains('good'))next()}
+});
+ans.addEventListener('submit',e=>{e.preventDefault();if(phase==='q')answer($('#inp').value,null);else if(phase==='fb')next()});
+fb.addEventListener('click',e=>{if(e.target.closest('#nextB'))next()});
+document.addEventListener('keydown',e=>{
+ if(e.ctrlKey||e.metaKey||e.altKey||$('#vTrain').hidden||!R)return;
+ const tag=e.target.tagName;
+ if(e.key==='Enter'){if(tag==='INPUT'||tag==='BUTTON')return;
+  if(phase==='fb'){e.preventDefault();next()}else if(phase==='q'&&cur&&cur.k==='self'){e.preventDefault();reveal()}else if(phase==='end'){e.preventDefault();start(R.mode,R.ids)}return}
+ if(tag==='INPUT')return;
+ if(phase==='q'&&cur){const k=ek(cur);
+  if(k==='ch'&&/^[1-6]$/.test(e.key)){const b=ans.querySelectorAll('.opt')[+e.key-1];if(b)answer(b.dataset.v,b)}
+  else if(k==='pad'&&/^[0-9]$/.test(e.key))answer(e.key,ans.querySelector(`[data-v="${e.key}"]`));
+  else if(k==='self'&&e.key===' '){e.preventDefault();reveal()}}
+ else if(phase==='rev'&&/^[1-3]$/.test(e.key))selfGrade({1:2,2:1,3:0}[e.key]);
+});
+$('#inBtn').addEventListener('click',()=>setInput('btn'));
+$('#inType').addEventListener('click',()=>setInput('type'));
+$('#snd').addEventListener('click',()=>{st.sound=!st.sound;save();sets()});
+$('#rst').addEventListener('click',e=>{
+ const t=e.target.closest('button');if(!t)return;
+ if(t.id==='rstBtn')$('#rst').innerHTML='<span>Стереть весь прогресс и рекорд?</span><span><button class="lnk" id="rY">Да, стереть</button><button class="lnk" id="rN">Нет</button></span>';
+ else{if(t.id==='rY'){st.it={};st.best=0;save();mosaic();sets();start(R?R.mode:'mix')}$('#rst').innerHTML='<button class="lnk" id="rstBtn">Сбросить прогресс</button>'}
+});
+const tab=v=>{$('#vTrain').hidden=v!=='t';$('#vRef').hidden=v!=='r';$('#tTrain').setAttribute('aria-selected',v==='t');$('#tRef').setAttribute('aria-selected',v==='r')};
+$('#tTrain').addEventListener('click',()=>tab('t'));
+$('#tRef').addEventListener('click',()=>tab('r'));
+
+const CJ=[['yo','я','soy'],['nosotros / nosotras','мы','somos'],['tú','ты','eres'],['vosotros / vosotras','вы (Испания)','sois'],['él / ella / usted','он / она / Вы','es'],['ellos / ellas / ustedes','они / вы','son']];
+$('#cj').innerHTML='<span class="ch">Единственное число</span><span class="ch">Множественное число</span>'+CJ.map(c=>`<button class="cc" data-say="${esc(c[0].split(' / ')[0]+' '+c[2])}"><span class="pr" lang="es">${esc(c[0])}</span><span class="ru">${esc(c[1])}</span><span class="fm" lang="es">${c[2]}</span><span class="tx">[${FT[c[2]]}]</span></button>`).join('');
+$('#nums').innerHTML=N.map((w,i)=>`<button class="nt" data-say="${w}"><b>${i}</b><span lang="es">${w}</span><small>[${NT[i]}]</small></button>`).join('');
+$('#vRef').addEventListener('click',e=>{
+ const h=e.target.closest('#hideF,#hideN');
+ if(h){const box=h.id==='hideF'?$('#cj'):$('#nums'),cls=h.id==='hideF'?'hid':'hidn',on=box.classList.toggle(cls);box.querySelectorAll('.open').forEach(x=>x.classList.remove('open'));h.textContent=(on?'Открыть ':'Закрыть ')+(h.id==='hideF'?'формы':'слова');return}
+ const b=e.target.closest('[data-say]');if(b){b.classList.add('open');speak(b.dataset.say)}
+});
+
+const boot=d=>{
+ try{const s=(d&&d.st)||JSON.parse(localStorage.getItem(KEY)||'null');if(s&&s.v===1)st=Object.assign(st,s)}catch(e){}
+ sets();mosaic();start('mix');
+};
+try{window.claude&&window.claude.hot&&window.claude.hot.snapshot&&window.claude.hot.snapshot(()=>({st}))}catch(e){}
+if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.ready(boot);else boot((window.claude&&window.claude.hot&&window.claude.hot.data)||{});
+}
+</script>
+</body>
+</html>
